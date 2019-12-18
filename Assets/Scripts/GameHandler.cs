@@ -6,7 +6,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
+/*Recursive backtracker
 
+Given a current cell as a parameter,
+    Mark the current cell as visited
+    While the current cell has any unvisited neighbour cells
+        Chose one of the unvisited neighbours
+        Remove the wall between the current cell and the chosen cell
+Invoke the routine recursively for a chosen cell
+which is invoked once for any initial cell in the area.
+
+Note : implemented without recursion , but with 2 Main Functions using loops
+ * 
+ */
 public class GameHandler : MonoBehaviour
 {
    
@@ -44,7 +56,7 @@ public class GameHandler : MonoBehaviour
     }
     
     //Checking Neighbours If they are Vistided
-    private bool RouteStillAvailable(int row, int column) {
+    private bool RouteExists(int row, int column) {
         int availableRoutes = 0;
         
         if (row > 0 && !Maze[row-1,column].visited) {
@@ -79,7 +91,7 @@ public class GameHandler : MonoBehaviour
     private void DestroyAdjacent()
     {
         //If there is no Route available 
-        while (RouteStillAvailable( currRow, currCol))
+        while (RouteExists( currRow, currCol))
         {
             int direction = Random.Range(1, 5);
             
@@ -108,15 +120,36 @@ public class GameHandler : MonoBehaviour
                 Maze[currRow, currCol - 1].right = false;
                 currCol--;
             } 
-            Maze[currCol, currCol].visited = true;
+            Maze[currRow, currCol].visited = true;
 
         }
     }
 
     
-
+    //When we hit dead end and we cant visit other cells 
+    //through our root and first 3 steps
+    //we go to last step of algorithm and search for unvisited
+    //cells in our maze and repeat the procedure if we find one
     private void SearchNew()
     {
+
+        Completed = true;
+        for (int i = 0; i < Heigth; i++)
+        {
+            for (int j = 0; j < Width; j++)
+            {
+                if (!Maze[i, j].visited)
+                {
+                    Maze[i, j].visited = true;
+                    Completed = false;
+                    currCol = j;
+                    currRow = i;
+                    return;
+                    
+                }
+            }
+        }
+
     }
     
    
@@ -148,7 +181,14 @@ public class GameHandler : MonoBehaviour
 
     public void DrawMaze()
     {
-        
+        //Print in Console test
+        for (int i = 0; i < Heigth; i++)
+        {
+            for (int j = 0; j < Width; j++)
+            {
+                
+            }
+        }
     }
 
     //Gets called when Generate Maze button is hit 
