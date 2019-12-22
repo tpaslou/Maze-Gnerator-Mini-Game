@@ -17,6 +17,7 @@
             </e>
           </e>
         </e>
+        <e p="ScaleScript.cs" t="Include" />
         <e p="Scripts" t="Include">
           <e p="MazeGenerator.cs" t="Include" />
         </e>

@@ -297,7 +297,7 @@ public class MazeGenerator : MonoBehaviour
 
     }
 
-    public void ScaleMaze(GameObject GO)
+    private void ScaleMaze(GameObject GO)
     {
         //Probably there is a  better way to do it 
         //so i will do it with if
@@ -315,6 +315,8 @@ public class MazeGenerator : MonoBehaviour
         
         GO.transform.localScale = new Vector3(Scale_Factor , 0.5f,Scale_Factor);
     }
+
+  
 
     //Gets called when Generate Maze button is hit 
     public void InitialiseMaze()
