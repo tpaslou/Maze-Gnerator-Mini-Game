@@ -18,7 +18,7 @@
           </e>
         </e>
         <e p="Scripts" t="Include">
-          <e p="GameHandler.cs" t="Include" />
+          <e p="MazeGenerator.cs" t="Include" />
         </e>
       </e>
       <e p="DTT_Test_LoupasAth.sln" t="IncludeFlat" />

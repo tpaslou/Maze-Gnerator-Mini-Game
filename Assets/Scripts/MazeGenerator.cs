@@ -19,7 +19,7 @@ which is invoked once for any initial cell in the area.
 Note : implemented without recursion , but with 2 Main Functions using loops
  * 
  */
-public class GameHandler : MonoBehaviour
+public class MazeGenerator : MonoBehaviour
 {
    
     public int Width, Heigth;
@@ -27,7 +27,11 @@ public class GameHandler : MonoBehaviour
     public InputField WidthInput, HeightInput;
 
     public Cell[,] Maze;
-
+    //3D reconstruction Variables
+    public GameObject wall;
+    public float size = 2f;
+    
+    //Pseudo-Recursive Backtracing variables 
     private int currRow, currCol=0;
     private bool Completed = false;
 
@@ -56,22 +60,22 @@ public class GameHandler : MonoBehaviour
     }
     
     //Checking Neighbours If they are Vistided
-    private bool RouteExists(int row, int column) {
+    private bool RouteExists(int row, int col) {
         int availableRoutes = 0;
         
-        if (row > 0 && !Maze[row-1,column].visited) {
+        if (row > 0 && !Maze[row-1,col].visited) {
             availableRoutes++;
         }
 
-        if (row < Heigth - 1 && !Maze [row + 1, column].visited) {
+        if (row < Heigth - 1 && !Maze [row + 1, col].visited) {
             availableRoutes++;
         }
 
-        if (column > 0 && !Maze[row,column-1].visited) {
+        if (col > 0 && !Maze[row,col-1].visited) {
             availableRoutes++;
         }
 
-        if (column < Width-1 && !Maze[row,column+1].visited) {
+        if (col < Width-1 && !Maze[row,col+1].visited) {
             availableRoutes++;
         }
         
@@ -88,7 +92,7 @@ public class GameHandler : MonoBehaviour
         }
     }
     
-    private void DestroyAdjacent()
+    private void DestroyCurrent()
     {
         //If there is no Route available 
         while (RouteExists( currRow, currCol))
@@ -107,7 +111,7 @@ public class GameHandler : MonoBehaviour
             }else if (direction == 2 && isValidCell(currRow + 1, currCol))
             {//down
                 Maze[currRow + 1, currCol].up = false;
-                Maze[currRow, currRow].down = false;
+                Maze[currRow, currCol].down = false;
                 currRow++;
             }else if (direction == 3 && isValidCell(currRow, currCol + 1))
             {//right
@@ -140,10 +144,13 @@ public class GameHandler : MonoBehaviour
             {
                 if (!Maze[i, j].visited)
                 {
-                    Maze[i, j].visited = true;
                     Completed = false;
                     currCol = j;
                     currRow = i;
+                    DestroyAdjacent(i,j);;
+                    
+                    Maze[i, j].visited = true;
+
                     return;
                     
                 }
@@ -151,8 +158,43 @@ public class GameHandler : MonoBehaviour
         }
 
     }
-    
-   
+
+    private void DestroyAdjacent(int row, int column)
+    {
+
+        while (true)
+        {
+            int direction = Random.Range(1, 5);
+            //int direction = ProceduralNumberGenerator.GetNextNumber ();
+
+            if (direction == 1 && row > 0 && Maze[row - 1, column].visited)
+            {
+                Maze[row, column].up = false;
+                Maze[row - 1, column].down = false;
+                break;
+            }
+            else if (direction == 2 && row < (Heigth - 2) && Maze[row + 1, column].visited)
+            {
+                Maze[row, column].down = false;
+                Maze[row + 1, column].up = false;
+                break;
+            }
+            else if (direction == 3 && column > 0 && Maze[row, column - 1].visited)
+            {
+                Maze[row, column].left = false;
+                Maze[row, column - 1].right = false;
+                break;
+            }
+            else if (direction == 4 && column < (Width - 2) && Maze[row, column + 1].visited)
+            {
+                Maze[row, column].right = false;
+                Maze[row, column + 1].left = false;
+                break;
+            }
+        }
+    }
+
+
 
     //Create Maze
     public void CreateMaze()
@@ -171,7 +213,7 @@ public class GameHandler : MonoBehaviour
       Maze[0, 0].visited = true;
       while ( !Completed)
       {
-          DestroyAdjacent();//Keeps walking till a dead end
+          DestroyCurrent();//Keeps walking till a dead end
           SearchNew();//Search for the the next unvisited cell with an adjacent visited cell.If there isnt any one the we are done
       }
 
@@ -181,14 +223,57 @@ public class GameHandler : MonoBehaviour
 
     public void DrawMaze()
     {
-        //Print in Console test
+        GameObject container = GameObject.Find("Table/MazePivot");
+        //We get our pivot point to start drawing in Word Cordinates
+        float px = container.transform.position.x;
+        float pz = container.transform.position.z;
+        
         for (int i = 0; i < Heigth; i++)
         {
             for (int j = 0; j < Width; j++)
             {
                 
+                //For every cell we check our values and if true we spawn the desired walls
+                //We use our pivot values as offset for starting point
+                if (j == 0) {
+                    if(Maze[i,j].left){
+                    GameObject Wall = Instantiate (wall, new Vector3 (px+i*size, 0, pz+(j*size) - (size/2f)), Quaternion.identity) as GameObject;
+                    Wall.transform.parent = container.transform;
+                    Wall.name = "LeftWall " + i + "," + j;
+                    }
+                }
+
+                if (Maze[i, j].right)
+                {
+                    GameObject Wall = Instantiate(wall, new Vector3(px+i * size, 0, pz+(j * size) + (size / 2f)),
+                        Quaternion.identity) as GameObject;
+                    
+                    Wall.name = "RightWall " + i + "," + j;
+                    Wall.transform.parent = container.transform;
+                }
+
+                if (i == 0) {
+                    if(Maze[i,j].up){
+                    GameObject Wall = Instantiate (wall, new Vector3 (px+(i*size) - (size/2f), 0, pz+j*size), Quaternion.identity) as GameObject;
+                    Wall.name = "UpperWall " + i + "," + j;
+                    Wall.transform.parent = container.transform; 
+                    Wall.transform.Rotate (Vector3.up * 90f);
+                    }
+                }
+
+                if (Maze[i, j].down)
+                {
+                    GameObject Wall = Instantiate(wall, new Vector3(px+(i * size) + (size / 2f), 0, pz+j * size),
+                        Quaternion.identity) as GameObject;
+                    Wall.transform.parent = container.transform;
+                    Wall.name = "BottomWall " + i + "," + j;
+                    Wall.transform.Rotate(Vector3.up * 90f);
+                }
             }
         }
+        //Then we scale our object base on our Width and Height Dimensions
+        
+      
     }
 
     //Gets called when Generate Maze button is hit 
@@ -202,7 +287,7 @@ public class GameHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       
+    
         
     }
 
