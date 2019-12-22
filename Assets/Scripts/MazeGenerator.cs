@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -34,7 +35,8 @@ public class MazeGenerator : MonoBehaviour
     //Pseudo-Recursive Backtracing variables 
     private int currRow, currCol=0;
     private bool Completed = false;
-
+    private int max;
+    public float Scale_Factor = 1;
 
     //This is the Cell Class whitch consists of the walls and the visited 
     //var in order to use it our maze generation algorithm
@@ -199,6 +201,19 @@ public class MazeGenerator : MonoBehaviour
     //Create Maze
     public void CreateMaze()
     {
+        //If there is a maze created before we need to reset some values
+      if (GameObject.Find("Table/MazePivot").transform.childCount > 0)
+      {
+          Array.Clear(Maze,0,Maze.Length);
+
+          foreach (Transform child in GameObject.Find("Table/MazePivot").transform) {
+              GameObject.Destroy(child.gameObject);
+          }
+
+          currCol = currRow = 0;
+          Completed = false;
+
+      }
       //Initialize
       Maze = new Cell[Heigth,Width];
       for (int i = 0; i < Heigth; i++)
@@ -216,8 +231,13 @@ public class MazeGenerator : MonoBehaviour
           DestroyCurrent();//Keeps walking till a dead end
           SearchNew();//Search for the the next unvisited cell with an adjacent visited cell.If there isnt any one the we are done
       }
+      
+      //If there is already a maze drawn In Scene We Destroy the Old ones
+    
+    
 
     }
+
 
    
 
@@ -272,8 +292,28 @@ public class MazeGenerator : MonoBehaviour
             }
         }
         //Then we scale our object base on our Width and Height Dimensions
+        //container.transform.localScale = new Vector3(1,1,1);
+        ScaleMaze(container);
+
+    }
+
+    public void ScaleMaze(GameObject GO)
+    {
+        //Probably there is a  better way to do it 
+        //so i will do it with if
+
+        Debug.Log("On Scale Function : " + Heigth + " "+ Width);
+        max = Math.Max(Heigth, Width);
         
-      
+        if (max <= 5)
+        {
+            Scale_Factor = 5;
+        }else
+        {
+            Scale_Factor = (float)50 / (float)max;
+        }
+        
+        GO.transform.localScale = new Vector3(Scale_Factor , 0.5f,Scale_Factor);
     }
 
     //Gets called when Generate Maze button is hit 
