@@ -15,7 +15,6 @@ public class GameHandler : MonoBehaviour
     public void StartGame()
     {
         
-        if(!Started){
         string pos;
         int width, height;
         GameObject container = GameObject.Find("Table/MazePivot");
@@ -31,8 +30,7 @@ public class GameHandler : MonoBehaviour
         //Start
         if(GameObject.Find("MazePivot/LeftWall 0,0")!=null) GameObject.Find("MazePivot/LeftWall 0,0").GetComponent<MeshRenderer>().material = startMat;
         if(GameObject.Find("MazePivot/UpperWall 0,0")!=null)GameObject.Find("MazePivot/UpperWall 0,0").GetComponent<MeshRenderer>().material = startMat;
-        if(GameObject.Find("MazePivot/BottomWall 0,0")!=null)GameObject.Find("MazePivot/BottomWall 0,0").GetComponent<MeshRenderer>().material = startMat;
-        if(GameObject.Find("MazePivot/RightWall 0,0")!=null)GameObject.Find("MazePivot/RightWall 0,0").GetComponent<MeshRenderer>().material = startMat;
+   
 
         //End
         if (GameObject.Find("MazePivot/BottomWall" + pos) != null)
@@ -69,7 +67,8 @@ public class GameHandler : MonoBehaviour
 
         }
         
-        
+        if(!Started){
+
         //Create Player and add the needed Attributes
         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         sphere.transform.position = new Vector3(px, 1.5f, pz);

@@ -200,9 +200,12 @@ public class MazeGenerator : MonoBehaviour
         //If there is a maze created before we need to reset some values
       if (GameObject.Find("Table/MazePivot").transform.childCount > 0)
       {
+          GameObject pivot = GameObject.Find("Table/MazePivot");
+          Destroy(GameObject.Find("Player"));
+          pivot.GetComponent<GameHandler>().Started = false;
           Array.Clear(Maze,0,Maze.Length);
 
-          foreach (Transform child in GameObject.Find("Table/MazePivot").transform) {
+          foreach (Transform child in pivot.transform) {
               GameObject.Destroy(child.gameObject);
           }
 
