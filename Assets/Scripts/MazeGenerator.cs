@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -302,7 +298,7 @@ public class MazeGenerator : MonoBehaviour
         //Probably there is a  better way to do it 
         //so i will do it with if
 
-        Debug.Log("On Scale Function : " + Heigth + " "+ Width);
+        //Debug.Log("On Scale Function : " + Heigth + " "+ Width);
         max = Math.Max(Heigth, Width);
         
         if (max <= 5)
