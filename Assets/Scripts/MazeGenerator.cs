@@ -208,6 +208,7 @@ public class MazeGenerator : MonoBehaviour
           foreach (Transform child in pivot.transform) {
               GameObject.Destroy(child.gameObject);
           }
+          pivot.transform.localScale = new Vector3(1,1,1);
 
           currCol = currRow = 0;
           Completed = false;
