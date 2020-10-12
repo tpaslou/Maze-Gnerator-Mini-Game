@@ -18,11 +18,12 @@ Note : implemented without recursion , but with 2 Main Functions using loops
  */
 public class MazeGenerator : MonoBehaviour
 {
-   
+    public GameObject container;
+
     public int Width, Heigth;
 
     public InputField WidthInput, HeightInput;
-
+    
     public Cell[,] Maze;
     //3D reconstruction Variables
     public GameObject wall;
@@ -33,7 +34,7 @@ public class MazeGenerator : MonoBehaviour
     private bool Completed = false;
     private int max;
     public float Scale_Factor = 1;
-
+    
     //This is the Cell Class whitch consists of the walls and the visited 
     //var in order to use it our maze generation algorithm
     public class Cell
@@ -198,9 +199,9 @@ public class MazeGenerator : MonoBehaviour
     public void CreateMaze()
     {
         //If there is a maze created before we need to reset some values
-      if (GameObject.Find("Table/MazePivot").transform.childCount > 0)
+      if (container.transform.childCount > 0)
       {
-          GameObject pivot = GameObject.Find("Table/MazePivot");
+          GameObject pivot = container;
           Destroy(GameObject.Find("Player"));
           pivot.GetComponent<GameHandler>().Started = false;
           Array.Clear(Maze,0,Maze.Length);
@@ -243,7 +244,6 @@ public class MazeGenerator : MonoBehaviour
 
     public void DrawMaze()
     {
-        GameObject container = GameObject.Find("Table/MazePivot");
         //We get our pivot point to start drawing in Word Cordinates
         float px = container.transform.position.x;
         float pz = container.transform.position.z;
@@ -291,12 +291,15 @@ public class MazeGenerator : MonoBehaviour
                 }
             }
         }
+        
         //Then we scale our object base on our Width and Height Dimensions
         //container.transform.localScale = new Vector3(1,1,1);
+        StaticBatchingUtility.Combine(container);
         ScaleMaze(container);
 
     }
 
+    
     private void ScaleMaze(GameObject GO)
     {
         //Probably there is a  better way to do it 
@@ -326,16 +329,5 @@ public class MazeGenerator : MonoBehaviour
         DrawMaze();
     }
     
-    // Start is called before the first frame update
-    void Start()
-    {
-    
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-       
-    }
+  
 }
